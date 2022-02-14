@@ -34,15 +34,16 @@
             <p><button id="btn2" onclick='playStop()' disabled>Play</button></p>
           </div>
         </div>
-      </div>
-    </div>
-    <div>
-      <form onsubmit='SubForm(); return false;' id="myForm"> 
-        <div>
-          <label for="choice">Select the piece you like</label>
-          <input name="choice" id="choice" value="1">
+        <div class="row text-center" style="margin-top: 70px;">
+          <form onsubmit='SubForm(); return false;' id="myForm"> 
+            <div>
+              <label>Input number of your favorite piece</label>
+              <input name="choice1" id="choice1" value="1">
+              <input type="submit">
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
     <script>
       var log = document.getElementById('log');
