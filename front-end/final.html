@@ -25,6 +25,7 @@
             <p id=log>no file selected</p>
             <button onclick='fromURL("9.mid", 1); return false;'>Load Song</button> 
             <p><button id="btn" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase" value=0>
           </div>
         </div>
         <div class="row">
@@ -58,19 +59,22 @@
       
       function load(data, name) {
         try {
-          player = JZZ.MIDI.SMF(data).player();
+          var x = document.getElementById("increase").value; 
+          console.log(x);
+          player = JZZ.MIDI.SMF(data, true, parseInt(x)).player();
           player.connect(out);
           player.onEnd = function() {
             playing = false;
             btn.innerHTML = 'Play';
           }
+          
           playing = true;
           player.play();
           var c;
-          for (c = 0; c < 16; c++) JZZ.MIDI.allSoundOff(c);
           log.innerHTML = name;
           btn.innerHTML = 'Stop';
           btn.disabled = false;
+          player.M
         }
         catch (e) {
           log.innerHTML = e;
@@ -93,7 +97,7 @@
         window.location.href = "index.html";
       } 
       
-      function fromURL(name, playerNum) {
+      function fromURL(name, playerNum, soundChange) {
         clear();
         // var url = document.getElementById('url').value;
         var url = 'http://127.0.0.1:5500/front-end/' + name;

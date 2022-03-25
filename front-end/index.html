@@ -12,6 +12,8 @@
     <script src="node_modules\jzz-midi-smf\javascript\JZZ.midi.SMF.js"></script>
     <script src="node_modules\jzz-synth-tiny\javascript\JZZ.synth.Tiny.js"></script>
     <script src="node_modules\jzz-synth-osc\javascript\JZZ.synth.OSC.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
     <!-- <link rel="stylesheet" href="styles.css"> -->
   </head>
   <body>
@@ -26,18 +28,21 @@
             <p id=log>no file selected</p>
             <button onclick='fromURL("1.mid", 1); return false;'>Load Song</button> 
             <p><button id="btn" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase1" value=0>
           </div>
           <div class="col-md-4 text-center">
             <h3>2</h3>
             <p id=log2>no file selected</p>
             <button onclick='fromURL("2.mid", 2); return false;'>Load Song</button> 
             <p><button id="btn2" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase2" value=0>
           </div>
           <div class="col-md-4 text-center">
             <h3>3</h3>
             <p id=log3>no file selected</p>
             <button onclick='fromURL("3.mid", 3); return false;'>Load Song</button> 
             <p><button id="btn3" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase3" value=0>
           </div>
         </div>
         <div class="row">
@@ -46,18 +51,21 @@
             <p id=log4>no file selected</p>
             <button onclick='fromURL("4.mid", 4); return false;'>Load Song</button> 
             <p><button id="btn4" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase4" value=0>
           </div>
           <div class="col-md-4 text-center">
             <h3>5</h3>
             <p id=log5>no file selected</p>
             <button onclick='fromURL("5.mid", 5); return false;'>Load Song</button> 
             <p><button id="btn5" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase5" value=0>
           </div>
           <div class="col-md-4 text-center">
             <h3>6</h3>
             <p id=log6>no file selected</p>
-            <button onclick='fromURL("6.mid", 6); return false;'>Load Song</button> 
+            <button onclick='fromURL("OG3.mid", 6); return false;'>Load Song</button> 
             <p><button id="btn6" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase6" value=0>
           </div>
         </div>
         <div class="row text-center" style="margin-top: 70px;">
@@ -65,7 +73,6 @@
             <div>
               <label>Input numbers of your 2 favorite pieces</label>
               <input name="choice1" id="choice1" value="1">
-              <input name="choice2" id="choice2" value="2">
               <input type="submit">
               <!-- <label for="choice2">Select the piece you like</label>
               <input name="choice2" id="choice2" value="1"> -->
@@ -75,8 +82,10 @@
       </div>
     </div>
     <script>
+      // inital(); 
       var log = document.getElementById('log');
       var btn = document.getElementById('btn');
+      var increase = parseInt(document.getElementById('increase1').value);
       function report(s) { return function() { log.innerHTML = s; }; }
       
       // JZZ.synth.OSC.register('Web Audio');
@@ -96,9 +105,9 @@
       }
 
       
-      function load(data, name) {
+      function load(data, name, increase) {
         try {
-          player = JZZ.MIDI.SMF(data).player();
+          player = JZZ.MIDI.SMF(data, true, increase).player();
           player.connect(out);
           player.onEnd = function() {
             playing = false;
@@ -135,22 +144,28 @@
         if (playerNum == 2){
           log = document.getElementById('log2');
           btn = document.getElementById('btn2');
+          increase = parseInt(document.getElementById('increase2').value)
         } else if (playerNum == 3){
           log = document.getElementById('log3');
           btn = document.getElementById('btn3');
+          increase = parseInt(document.getElementById('increase3').value)
         } else if (playerNum == 4){
           log = document.getElementById('log4');
           btn = document.getElementById('btn4');
+          increase = parseInt(document.getElementById('increase4').value)
         } else if (playerNum == 5){
           log = document.getElementById('log5');
           btn = document.getElementById('btn5');
+          increase = parseInt(document.getElementById('increase5').value)
         }else if (playerNum == 6){
           log = document.getElementById('log6');
           btn = document.getElementById('btn6');
+          increase = parseInt(document.getElementById('increase6').value)
         }    
         else{
           log = document.getElementById('log');
           btn = document.getElementById('btn');
+          increase = parseInt(document.getElementById('increase1').value)
         }
         // var url = document.getElementById('url').value;
         var url = 'http://127.0.0.1:5500/front-end/' + name;
@@ -170,7 +185,7 @@
                   r = xhttp.responseText;
                   for (i = 0; i < r.length; i++) data += String.fromCharCode(r.charCodeAt(i) & 0xff);
                 }
-                load(data, url);
+                load(data, url, increase);
               }
               else {
                 log.innerHTML = 'XMLHttpRequest error';
@@ -189,9 +204,21 @@
       function change_page(){
         window.location.href = "second.html";
       } 
-      function SubForm(){
+      function inital(){
           $.ajax({
               url: 'http://127.0.0.1:5000/1',
+              type: 'post',
+              data: 'OG2.mid',
+              success: function(){
+                  alert("worked");
+                  change_page();
+              }
+              
+          });
+      }
+      function SubForm(){
+          $.ajax({
+              url: 'http://127.0.0.1:5000/2',
               type: 'post',
               data: $('#myForm').serialize(),
               success: function(){
@@ -204,7 +231,6 @@
       
       </script>
 
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    
   </body>
 </html>

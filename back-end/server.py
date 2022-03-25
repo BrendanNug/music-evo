@@ -1,7 +1,7 @@
 from flask import Flask, request
 from flask_restful import Api, Resource
 from flask_cors import CORS, cross_origin
-from main import first, final; 
+from main import initlazation, loop; 
 
 
 app = Flask(__name__)
@@ -16,23 +16,23 @@ FIRST_FILES= {"file1": "1.mid", "file2": "2.mid", "file3": "3.mid", "file4": "4.
 SECOND_FILES = {"file7": "7.mid", "file8": "8.mid"}
 FINAL_FILE = {"file9": "9.mid"}
 POPULATION = []
-
+initlazation("OG2.mid", "OG2.mid")
 
 class FirstRound(Resource):
     def post(self):
         # print(request.form.to_dict()["choice1"])
         # print(request.form.to_dict()["choice2"])
         # print(request.form.getlist('choice2[]'))
-        POPULATION.extend(first(request.form.to_dict()["choice1"],request.form.to_dict()["choice2"]))
+        initlazation("OG2.mid", "OG2.mid")
 
-        print(POPULATION)
+        # print(POPULATION)
         return FIRST_FILES
 
 class SecondRound(Resource):
     def post(self):
         # print(POPULATION)
-        # print(request.form.to_dict()["choice1"])
-        final(POPULATION, request.form.to_dict()["choice1"])
+        print(request.form.to_dict()["choice1"])
+        loop(request.form.to_dict()["choice1"])
         return SECOND_FILES
 
 api.add_resource(FirstRound, "/1")

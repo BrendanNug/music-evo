@@ -35,6 +35,12 @@
 import random
 
 from mido import Message, MetaMessage, MidiFile, MidiTrack
+from rule import rule
+
+
+
+
+
 class Feature_pool:
 
   def __init__(self, pool=[]):
@@ -130,6 +136,7 @@ class Music:
     def __init__(self,track_list=[]):
       self.track_list = track_list
       self.ticks_per_beat = 100
+      self.fitness = 0
 
     def set_ticks_per_beat(self, ticks_per_beat):
       self.ticks_per_beat = ticks_per_beat
@@ -159,7 +166,14 @@ class Music:
 
 
         print("")
-
+    
+    def evaluate(self,rule_pool,choice,weight=None):
+      if weight is None:
+          weight = [1 for _ in range(len(rule_pool))]
+      n=0
+      for rule in rule_pool:
+        self.fitness += rule(self,choice) * weight[n]
+        n+=1
 
 
     def save_midi(self,save_path = 'new_song.mid'):
@@ -252,10 +266,68 @@ def reverse_mutation(music, track_index=0, feature_index=0):
     orig.reverse()
     music.track_list[track_index].feature_list[0][feature_index] = orig
     return orig
-def fake_evaulation(pool,choice):
-  pass
+
+def exchange_mutation(music, track_index=0, feature_index=0):
+    orig = music.track_list[track_index].feature_list[0][feature_index]
+    #print(orig)
+
+    pos = random.choices([x for x in range(len(orig))], k=2)
+    pos1, pos2 = pos[0], pos[1]
+    orig[pos1], orig[pos2] = orig[pos2], orig[pos1]
+    music.track_list[track_index].feature_list[0][feature_index] = orig
+    return orig
+
+
+def evaluation(pop,choice,weight=None):
+  '''
+  alter the pool base on choice, by adding duplicate in it
+  :param pool: 
+  :param choice: 
+  :return: 
+  '''
+  fitness=[]
+  for item in pop:
+    item.evaluate(rule,choice,weight)
+    fitness.append(item.fitness)
+  return fitness
+
+def feedmax(pop,num = 2):
+  '''
+  TODO yapi
+  返回2个分最高的
+  
+  :param pop: 
+  :return: 
+  '''
+  pop = sorted(pop, key=lambda item: item.fitness, reverse=True)
+  
+  # print(pop[0],pop[1])
+  if num == 3:
+    return pop[0], pop[1],pop[2]
+
+  return pop[0],pop[1]
+
+def original(notes,tick):
+  '''
+  把原版变成一个个体，保留全部顺序
+  输入原本音乐文件，
+  尽量把pool里的feature带入形成一个feature 版的original TODO yapi
+  :return: music 
+  '''
+  music_form = Music()
+  music_form.track_list.append(Track())
+  music_form.track_list[0].feature_list = [[]]
+
+  music_form.track_list[0].feature_list[0].append(notes)
+  return music_form  
+        
+    
+  
+  
+  
+  
 if __name__ == "__main__":
-
-
-
-    pass
+  a= Music()
+  b = Music()
+  pop = [a,b]
+  feedmax(pop)

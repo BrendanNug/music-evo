@@ -26,12 +26,14 @@
             <p id=log>no file selected</p>
             <button onclick='fromURL("7.mid", 1); return false;'>Load Song</button> 
             <p><button id="btn" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase1" value=0>
           </div>
           <div class="col-md-4 text-center">
             <h3>8</h3>
             <p id=log2>no file selected</p>
             <button onclick='fromURL("8.mid", 2); return false;'>Load Song</button> 
             <p><button id="btn2" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase2" value=0>
           </div>
         </div>
         <div class="row text-center" style="margin-top: 70px;">
@@ -48,6 +50,7 @@
     <script>
       var log = document.getElementById('log');
       var btn = document.getElementById('btn');
+      var increase = parseInt(document.getElementById('increase1').value);
       function report(s) { return function() { log.innerHTML = s; }; }
       
       // JZZ.synth.OSC.register('Web Audio');
@@ -67,9 +70,9 @@
       }
 
       
-      function load(data, name) {
+      function load(data, name, increase) {
         try {
-          player = JZZ.MIDI.SMF(data).player();
+          player = JZZ.MIDI.SMF(data, true, increase).player();
           player.connect(out);
           player.onEnd = function() {
             playing = false;
@@ -107,10 +110,12 @@
         if (playerNum == 2){
           log = document.getElementById('log2');
           btn = document.getElementById('btn2');
+          increase = parseInt(document.getElementById('increase2').value)
           name = "8.mid";
         } else{
           log = document.getElementById('log');
           btn = document.getElementById('btn');
+          increase = parseInt(document.getElementById('increase1').value)
           name = "7.mid";
         }
         // var url = document.getElementById('url').value;
@@ -131,7 +136,7 @@
                   r = xhttp.responseText;
                   for (i = 0; i < r.length; i++) data += String.fromCharCode(r.charCodeAt(i) & 0xff);
                 }
-                load(data, url);
+                load(data, url, increase);
               }
               else {
                 log.innerHTML = 'XMLHttpRequest error';

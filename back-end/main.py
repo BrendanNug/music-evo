@@ -1,110 +1,258 @@
-from util import *
+from util import Track,Music,one_pt_crossover,reverse_mutation,evaluation,feedmax
 from midi_visualize import midi_visualize
-
+import shutil
+import os
 from mido.midifiles import MidiTrack
 from mido import MidiFile
 from mido import Message
 
-def first(file1, file2):
-  # get the list of all events
-  # events = mid.get_events()
+# get the list of all events
+# events = mid.get_events()
 
-  # get the np array of piano roll image
-  # roll = mid.get_roll()
+# get the np array of piano roll image
+# roll = mid.get_roll()
 
-  # draw piano roll by pyplot
-  # mid.draw_roll()
+# draw piano roll by pyplot
+# mid.draw_roll()
+from rule_weight import set_weight, read_weight
+import pickle
+
+# provide choice
+
+from feature_extraction import read_to_notes,containsPattern,compose
+from util import Feature,Feature_pool,original
+
+# weight = read_weight()
+# dir = 'choices'
+# for f in os.listdir(dir):
+#     os.remove(os.path.join(dir, f))
+# #read input 1
+# pop_num = 500
+# length =30
+# source1,tick1 = read_to_notes('12barblues_ms.mid')
+# org = original(source1, tick1) 
+# #read input 2
+# source2,tick2 = read_to_notes('12barblues_ms.mid')
+# 
+# #init pool
+# feature_pool = Feature_pool()
+# 
+# #extract featurse
+# containsPattern(feature_pool, source1,tick1)
+# feature_pool.show_pool()
+# 
+# 
+# #initliazaiton
+# population = []
+# for i in range(pop_num):
+#     track = Track([compose(length, feature_pool)])
+#     music = Music([track])
+#     population.append(music)
+# 
+# population[0].display()
+# for item in population:# TODO
+#   item.ticks_per_beat = tick1
+# save_path = "choices/1.mid"
+# population[0].save_midi(save_path)
+# mid2 = MidiFile(save_path)
+
+# midi_visualize(save_path)
 
 
+#loop of evoluation
 
-  # provide choice
-  # def main(file1, file2):
-  from feature_extraction import read_to_notes,containsPattern,compose
-  from util import Feature,Feature_pool
+#parent selection 
 
-  #read input 1
-  pop_num = 5
-  length =30
-  source1,tick1 = read_to_notes('C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/'+file1+'.mid')
+#crossover
 
-  #read input 2
-  source2,tick2 = read_to_notes('C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/'+file2+'.mid')
+#gen counter
+global counter,gen
+counter = 0
+gen = 0
 
-  #init pool
+
+def initlazation(file1='back-end/12barblues_ms.mid',file2='back-end/12barblues_ms.mid',pop_num=50,length=50):
+  global counter
+  counter= 0
+  global gen
+  gen= 0
+  dir = 'C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/'
+  # for f in os.listdir(dir):
+  #   os.remove(os.path.join(dir, f))
+  # read input 1
+
+  try:
+    source1, tick1 = read_to_notes("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/" + file1)
+  except:
+    source1, tick1 = read_to_notes('back-end/12barblues_ms.mid')
+
+  org = original(source1, tick1)
+  # read input 2
+  try:
+    source2, tick2 = read_to_notes("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/" + file2)
+  except:
+    source2, tick2 = read_to_notes('back-end/12barblues_ms.mid')
+
+  # init pool
   feature_pool = Feature_pool()
 
-  #extract featurse
+  # extract featurse
+  containsPattern(feature_pool, source1, tick1)
+  containsPattern(feature_pool, source2, tick2)
 
-  containsPattern(feature_pool, source1,tick1)
   feature_pool.show_pool()
 
-
-  #initliazaiton
+  # initliazaiton
   population = []
   for i in range(pop_num):
-      track = Track([compose(length, feature_pool)])
-      music = Music([track])
-      population.append(music)
+    track = Track([compose(length, feature_pool)])
+    music = Music([track])
+    population.append(music)
 
-  population[0].display()
-  population[0].ticks_per_beat = tick1
-  save_path = "C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/"+file1+".mid"
-  # population[0].save_midi(save_path)
+  for item in population:  # TODO
+    item.ticks_per_beat = tick1
+  save_path = "C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/my1.mid"
+  population[0].save_midi(save_path)
   mid2 = MidiFile(save_path)
+  
+  with open('population.list', 'wb') as population_file:
+    pickle.dump(population,population_file)
 
-  # midi_visualize(save_path)
-
-
-  #loop of evoluation
-
-  #parent selection 
-
-  #crossover
-  population[0].display()
-  population[1].display()
-  print("Cross-over:")
-  one_pt_crossover(population[0],population[1])
-  #mutation
-  population[0].display()
-  population[1].display()
-  print("Reverse mutated:")
-  reverse_mutation(population[0],track_index=0,feature_index=0)
-  reverse_mutation(population[1],track_index=0,feature_index=0)
-  population[0].display()
-  population[1].display()
-  population[0].save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/7.mid")
-  population[1].save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/8.mid")
-  print(population)
-  return population
+  weight = read_weight()
+  # user selection
+  # output 1，2 TODO switch to evaluated best as competcotr
+  a, b,c = feedmax(population,num=3)
+  a.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/1.mid")
+  counter +=1
+  b.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/2.mid")
+  counter +=1
+  c.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/3.mid")
+  counter +=1
 
 
-def final(population, file):
+
+def loop(choice='r'):
+  '''
+  all parameters,
+  :return: new population,final_product
+  '''
+  global gen
   inloop = True
-  while True:
-    # output 1，2 TODO switch to evaluated best as competcotr
-    # population[0].save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/"+file+".mid")
-    # population[1].save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/8.mid")
-    desicion = file
-    # receive choice
-    # desicion = input('I prefer___,anything else for roll')  #reroll to provide another set of choice
+  counter = 6
 
-    if int(desicion) == 1:
-      #give 1 more weighs
-      print('1 is better')
-      break
-    elif int(desicion) == 2:
-      #give 2more weighs
-      print('2 is better')
+  with open('population.list', 'rb') as population_file:
+    population = pickle.load(population_file)
+
+
+  # while inloop:
+    #TODO
+    # population[0].display()
+    # population[1].display()
+    one_pt_crossover(population[0], population[1])
+    # mutation
+    # population[0].display()
+    # population[1].display()
+    reverse_mutation(population[0], track_index=0, feature_index=0)
+    # reverse_mutation(population[1], track_index=0, feature_index=0)
+    # population[0].display()
+    # population[1].display()
+  
+  
+    if gen%50 == 0:
+      weight = read_weight()
+      #user selection
+      # output 1，2 TODO switch to evaluated best as competcotr
+      a,b= feedmax(population)
+      counter +=1
+      a.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/7.mid")
+      counter +=1
+      b.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/8.mid")
       
-      break
+      # receive choice
+      desicion = choice #reroll to provide another set of choice
+      
+      if desicion == '1':
+        #give 1 more weighs
+        print('1 is better')
+        desicion =a
+        print(a.fitness)
+  
+        fitness_list_1 = evaluation(population, desicion, weight)
+  
+      elif desicion == '2':
+        #give 2more weighs
+        print('2 is better')
+        desicion =b
+        print(b.fitness)
+  
+        fitness_list_1 = evaluation(population, desicion, weight)
 
-  #modify evaulation
-  fake_evaulation(population,desicion)
+      elif desicion == '3':
+        #give 2more weighs
+        print('3 is better')
+        desicion =b
+        print(b.fitness)
+  
+        fitness_list_1 = evaluation(population, desicion, weight)
+  
+      elif desicion == 's':
+        #stop loop
+        # output final result
+        # modify evaulation
+        fitness_list_1 = evaluation(population, desicion, weight)
+        # weight = [1, 0, 1]
+        # fitness_list_2=evaluation(population,org,weight)
+        fitness_list = []
+        for i in range(len(fitness_list_1)):
+          # fitness_list.append(fitness_list_1[i]+fitness_list_2[i])
+          fitness_list.append(fitness_list_1[i])
+        final, secondbest = feedmax(population)
+        final.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/9.mid")
+        print("here")
+        inloop = False
+        # break
+        
+      elif desicion == 'r':
+        #roll again
+    
+        # set weight to zeros, random evolve
+        old_weight = weight
+        set_weight([0,0,0])
+    
+        loop("1")
+
+        set_weight(old_weight)
+    
+      else:
+        print('wrong input')
+  with open('population.list', 'wb') as population_file:
+    pickle.dump(population, population_file)
+        
+        
+    # modify fitness base on selection
+    # modify evaulation
+    # fitness_list_1 = evaluation(population, desicion, weight)
+    # # weight = [1, 0, 1]
+    # # fitness_list_2=evaluation(population,org,weight)
+    # fitness_list = []
+    # for i in range(len(fitness_list_1)):
+    #   # fitness_list.append(fitness_list_1[i]+fitness_list_2[i])
+    #   fitness_list.append(fitness_list_1[i])
+    # final, secondbest = feedmax(population)
+
+    # print(best_index)
+    # print(max(fitness_list))
+    # print(min(fitness_list))
+    print('Gen',gen)
+    gen +=1
+    
+    
+
+  
+  
 
 
-  #end loop
 
-
-  #output final result
-
-  population[1].save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/9.mid")
+if __name__=="__main__":
+  population=initlazation()
+  loop()
