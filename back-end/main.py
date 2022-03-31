@@ -76,21 +76,20 @@ def initlazation(file1='back-end/12barblues_ms.mid',file2='back-end/12barblues_m
   counter= 0
   global gen
   gen= 0
-  currentDir = os.path.dirname(os.path.abspath(__file__))
-  dir = currentDir[:-8] + "front-end/"
+  dir = 'C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/'
   # for f in os.listdir(dir):
   #   os.remove(os.path.join(dir, f))
   # read input 1
 
   try:
-    source1, tick1 = read_to_notes(dir + file1)
+    source1, tick1 = read_to_notes("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/" + file1)
   except:
     source1, tick1 = read_to_notes('back-end/12barblues_ms.mid')
 
   org = original(source1, tick1)
   # read input 2
   try:
-    source2, tick2 = read_to_notes(dir + file2)
+    source2, tick2 = read_to_notes("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/" + file2)
   except:
     source2, tick2 = read_to_notes('back-end/12barblues_ms.mid')
 
@@ -112,7 +111,7 @@ def initlazation(file1='back-end/12barblues_ms.mid',file2='back-end/12barblues_m
 
   for item in population:  # TODO
     item.ticks_per_beat = tick1
-  save_path = dir+"my1.mid"
+  save_path = "C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/my1.mid"
   population[0].save_midi(save_path)
   mid2 = MidiFile(save_path)
   
@@ -123,11 +122,11 @@ def initlazation(file1='back-end/12barblues_ms.mid',file2='back-end/12barblues_m
   # user selection
   # output 1，2 TODO switch to evaluated best as competcotr
   a, b,c = feedmax(population,num=3)
-  a.save_midi(dir+"1.mid")
+  a.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/1.mid")
   counter +=1
-  b.save_midi(dir+"2.mid")
+  b.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/2.mid")
   counter +=1
-  c.save_midi(dir+"3.mid")
+  c.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/3.mid")
   counter +=1
 
 
@@ -140,8 +139,6 @@ def loop(choice='r'):
   global gen
   inloop = True
   counter = 6
-  currentDir = os.path.dirname(os.path.abspath(__file__))
-  dir = currentDir[:-8] + "front-end/"
 
   with open('population.list', 'rb') as population_file:
     population = pickle.load(population_file)
@@ -167,9 +164,9 @@ def loop(choice='r'):
       # output 1，2 TODO switch to evaluated best as competcotr
       a,b= feedmax(population)
       counter +=1
-      a.save_midi(dir+"7.mid")
+      a.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/7.mid")
       counter +=1
-      b.save_midi(dir+"8.mid")
+      b.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/8.mid")
       
       # receive choice
       desicion = choice #reroll to provide another set of choice
@@ -210,7 +207,7 @@ def loop(choice='r'):
           # fitness_list.append(fitness_list_1[i]+fitness_list_2[i])
           fitness_list.append(fitness_list_1[i])
         final, secondbest = feedmax(population)
-        final.save_midi(dir+"9.mid")
+        final.save_midi("C:/Users/bnuga/Documents/cisc 499/music-evo/front-end/9.mid")
         print("here")
         inloop = False
         # break
@@ -258,4 +255,4 @@ def loop(choice='r'):
 
 if __name__=="__main__":
   population=initlazation()
-  loop('1')
+  loop()

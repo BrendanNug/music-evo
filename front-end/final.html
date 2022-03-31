@@ -12,45 +12,40 @@
     <script src="node_modules\jzz-midi-smf\javascript\JZZ.midi.SMF.js"></script>
     <script src="node_modules\jzz-synth-tiny\javascript\JZZ.synth.Tiny.js"></script>
     <script src="node_modules\jzz-synth-osc\javascript\JZZ.synth.OSC.js"></script>
-    <script src="node_modules\jzz-gui-player\javascript\JZZ.gui.Player.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
   </head>
   <body>
     <div class="navbar">
       <h1 class="text-center">Evolutionary Music - Song Generator</h1>
     </div>
     <div class="jumbotron">
+      <div class="container">
         <div class="row">
-          <div class="col-md-12 text-center">
-            <h3>Your Song</h3>
-            <!-- <p id=log>no file selected</p> -->
-            <button onclick='fromURL("7.mid"); return false;'>Load Song</button> 
-            <!-- <p><button id="btn" onclick='playStop()' disabled>Play</button></p>
-            <input type="number" id="increase1" value=0> -->
+          <div class="col text-center">
+            <p id=log>no file selected</p>
+            <button onclick='fromURL("9.mid", 1); return false;'>Load Song</button> 
+            <p><button id="btn" onclick='playStop()' disabled>Play</button></p>
+            <input type="number" id="increase" value=0>
           </div>
         </div>
-        <div class="row text-center" style="margin-top: 70px;">
-          <div id=player></div>
+        <div class="row">
+          <div class="col text-center">
+            <button onclick="change_page()">Return to Start</button>
+          </div>
         </div>
-        <div class="row text-center" style="margin-top: 30px;">
-          <label>Change Midi Instrument</label>
-          <input type="number" id="increase" value=0 min=0 max=115>
-          <button onclick='fromURL("6.mid", true); return false;'>Update Instrument</button> 
-        </div>
+      </div>
     </div>
     <script>
-      // var log = document.getElementById('log');
-      // var btn = document.getElementById('btn');
-      // var increase = parseInt(document.getElementById('increase1').value);
-      function report(s) { return function() { console.log(s); }; }
+      var log = document.getElementById('log');
+      var btn = document.getElementById('btn');
+      function report(s) { return function() { log.innerHTML = s; }; }
       
       // JZZ.synth.OSC.register('Web Audio');
       // JZZ.synth.OSC.clear();
       JZZ.synth.Tiny.register('Web Audio');
 
       var out = JZZ().or(report('Cannot start MIDI engine!')).openMidiOut().or(report('Cannot open MIDI Out!'));
-      // var player;
-      var player = JZZ.gui.Player({at: 'player', midi: false, file: true });
+      var player;
       var playing = false;
       
       function clear() {
@@ -60,41 +55,51 @@
         btn.innerHTML = 'Play';
         btn.disabled = true;
       }
-      function load(data, name, increase, prep) {
-        var smf = JZZ.MIDI.SMF(data, true, increase);
-        player.load(smf);
-        player.play();
-        if(prep) player.stop();
-      }
+
       
-      // function load(data, name, increase) {
-      //   try {
-      //     player = JZZ.MIDI.SMF(data, true, increase).player();
-      //     player.connect(out);
-      //     player.onEnd = function() {
-      //       playing = false;
-      //       btn.innerHTML = 'Play';
-      //     }
-      //     playing = true;
-      //     player.play();
-      //     var c;
-      //     for (c = 0; c < 16; c++) JZZ.MIDI.allSoundOff(c);
-      //     log.innerHTML = name;
-      //     btn.innerHTML = 'Stop';
-      //     btn.disabled = false;
-      //   }
-      //   catch (e) {
-      //     log.innerHTML = e;
-      //   }
-      // }
+      function load(data, name) {
+        try {
+          var x = document.getElementById("increase").value; 
+          console.log(x);
+          player = JZZ.MIDI.SMF(data, true, parseInt(x)).player();
+          player.connect(out);
+          player.onEnd = function() {
+            playing = false;
+            btn.innerHTML = 'Play';
+          }
+          
+          playing = true;
+          player.play();
+          var c;
+          log.innerHTML = name;
+          btn.innerHTML = 'Stop';
+          btn.disabled = false;
+          player.M
+        }
+        catch (e) {
+          log.innerHTML = e;
+        }
+      }
       
       function playStop() {
-        player.stop();
-        playing = false;
+        if (playing) {
+          player.stop();
+          playing = false;
+          btn.innerHTML = 'Play';
+        }
+        else {
+          player.play();
+          playing = true;
+          btn.innerHTML = 'Stop';
+        }
       }
+      function change_page(){
+        window.location.href = "index.html";
+      } 
       
-      function fromURL(name, prep = false) {
-        playStop();
+      function fromURL(name, playerNum, soundChange) {
+        clear();
+        // var url = document.getElementById('url').value;
         var url = 'http://127.0.0.1:5500/front-end/' + name;
         try {
           var xhttp = new XMLHttpRequest();
@@ -112,17 +117,10 @@
                   r = xhttp.responseText;
                   for (i = 0; i < r.length; i++) data += String.fromCharCode(r.charCodeAt(i) & 0xff);
                 }
-                if (prep) {
-                  var increase = parseInt(document.getElementById('increase').value);
-                  load(data, url, increase, true);
-
-                } else{
-                  load(data, url, 0, false);
-                }
+                load(data, url);
               }
               else {
-                // log.innerHTML = 'XMLHttpRequest error';
-                console.log('XMLHttpRequest error');
+                log.innerHTML = 'XMLHttpRequest error';
               }
             }
           };
@@ -132,10 +130,10 @@
           xhttp.send();
         }
         catch (e) {
-          // log.innerHTML = 'XMLHttpRequest error';
-          console.log('XMLHttpRequest error');
+          log.innerHTML = 'XMLHttpRequest error';
         }
       }
+      
       
       </script>
 
