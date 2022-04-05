@@ -234,6 +234,11 @@ def loop(choice='r'):
 
             else:
                 print('wrong input')
+          
+          
+          
+    print('best fitness',population[0].fitness)
+    print('avg fitness', sum(c.fitness for c in population)/len(population))
     with open('population.list', 'wb') as population_file:
         pickle.dump(population, population_file)
 
