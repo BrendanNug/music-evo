@@ -150,15 +150,22 @@ def loop(choice='r'):
             # TODO
             # population[0].display()
             # population[1].display()
-            index_parent = random.choices([x for x in range(len(population))], k=2)
-            one_pt_crossover(population[index_parent[0]], population[index_parent[1]])
+
             # mutation
             # population[0].display()
             # population[1].display()
-            reverse_mutation(population[index_parent[0]], track_index=0, feature_index=0)
-            reverse_mutation(population[index_parent[1]], track_index=0, feature_index=0)
-            exchange_mutation(population[index_parent[0]], track_index=0, feature_index=0)
-            exchange_mutation(population[index_parent[1]], track_index=0, feature_index=0)
+
+            index_parent = random.choices([x for x in range(len(population))], k=3)
+            sub_population = [population[index_parent[0]],population[index_parent[1]],population[index_parent[2]]]
+            sub_population = feedmax(sub_population,3)
+            sub_population[2].track_list = sub_population[0].track_list.copy()
+            if random.randint(1,6)==2:
+                one_pt_crossover(sub_population[2], sub_population[1])
+
+            if random.randint(1,6)==2:
+                reverse_mutation(sub_population[2], track_index=0, feature_index=0)
+            if random.randint(1,3)==2:
+                exchange_mutation(sub_population[2], track_index=0, feature_index=0)
             # reverse_mutation(population[1], track_index=0, feature_index=0)
             # population[0].display()
             # population[1].display()
@@ -262,4 +269,4 @@ def loop(choice='r'):
 
 if __name__ == "__main__":
     population = initlazation("12barblues_ms.mid","12barblues_ms.mid")
-    loop('r')
+    loop('1')

@@ -19,7 +19,7 @@ def read_weight():
 
     :return: the list of floating point saved in rule_weight.txt
     '''
-    with open("back-end/rule_weight.txt","r") as f:
+    with open("rule_weight.txt","r") as f:
         weight = [float(line.strip()) for line in f]
         f.close()
         return weight
